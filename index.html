@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+                                                                                                                                                                                                                                                                                                                                                                <html>
+<head>
+    <script type="text/javascript">
+        window.onload = function() {
+            var dataPoints = [];
+            var chart;
+            var yVal = 0;
+            var xVal = 1;
+
+            $.getJSON("https://parse.ubidots.com/prv/Skynet/sum-server?token=BBFF-o9Wgd3hZokBMNd7d4vyzH9ZfLa5qj8&type=json", function(data) {
+                $.each(data, function(key, value){
+                    console.log(data)
+                    yVal = parseInt(value[0])
+                });
+
+                dataPoints.push({x: xVal, y: yVal});
+
+
+                    chart = new CanvasJS.Chart("chartContainer",{
+                    title: {
+                        text: "Web App Ubidots Challenge"
+                    },
+                    axisX: {
+                        title: "Axis X Seconds",
+                        interval: 1
+                    },
+                    axisY: {
+                        title: "SumServer"
+                    },
+                    data: [{
+                        type: "splineArea",
+                        dataPoints : dataPoints,
+                    }]
+                });
+                chart.render();
+                xVal++;
+                updateChart();
+            });
+            function updateChart() {
+                $.getJSON("https://parse.ubidots.com/prv/Skynet/sum-server?token=BBFF-o9Wgd3hZokBMNd7d4vyzH9ZfLa5qj8&type=json", function(data) {
+                    $.each(data, function(key, value){
+                        console.log(data)
+                        yVal = parseInt(value[0])
+                    });
+
+                    dataPoints.push({x: xVal++, y: yVal});
+
+                    if (dataPoints.length >  30 )
+                    {
+                        dataPoints.shift();
+                    }
+
+                    chart.render();
+                    setTimeout(function(){updateChart()}, 1000);
+                });
+            }
+        }
+    </script>
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</head>
+<body>
+<div id="chartContainer" style="height: 300px; width: 100%;"></div>
+</body>
+</html>
